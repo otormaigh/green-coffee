@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'kotlin-android'
 
 def releaseVersion = '3.2.1'
 def bintrayUser = hasProperty('bintray_user') ? bintray_user : ''
@@ -14,11 +15,6 @@ android {
     targetSdkVersion 27
     versionCode 1
     versionName releaseVersion
-  }
-
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
   }
 }
 
@@ -47,6 +43,7 @@ task sourcesJar(type: Jar) {
 }
 
 task javadoc(type: Javadoc) {
+  excludes = ['**/*.kt']
   source = android.sourceSets.main.java.srcDirs
   classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
 }
@@ -62,6 +59,7 @@ artifacts {
 }
 
 dependencies {
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.41"
   implementation 'io.cucumber:gherkin-jvm-deps:1.0.4'
   implementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

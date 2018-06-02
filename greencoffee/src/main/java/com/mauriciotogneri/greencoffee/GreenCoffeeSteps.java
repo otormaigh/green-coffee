@@ -39,18 +39,14 @@ import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.allOf;
 
-public class GreenCoffeeSteps
-{
-    List<StepDefinition> stepDefinitions()
-    {
+public class GreenCoffeeSteps {
+    List<StepDefinition> stepDefinitions() {
         List<StepDefinition> stepDefinitions = new ArrayList<>();
 
-        for (Method method : getClass().getDeclaredMethods())
-        {
+        for (Method method : getClass().getDeclaredMethods()) {
             String pattern = pattern(method);
 
-            if (pattern != null)
-            {
+            if (pattern != null) {
                 StepDefinition stepDefinition = new StepDefinition(pattern, method, this);
                 stepDefinitions.add(stepDefinition);
             }
@@ -59,45 +55,39 @@ public class GreenCoffeeSteps
         return stepDefinitions;
     }
 
-    private String pattern(Method method)
-    {
+    private String pattern(Method method) {
         String result = null;
 
         Given given = method.getAnnotation(Given.class);
 
-        if (given != null)
-        {
+        if (given != null) {
             result = given.value();
         }
 
         When when = method.getAnnotation(When.class);
 
-        if (when != null)
-        {
+        if (when != null) {
             checkInvalidStepDefinition(result, method);
             result = when.value();
         }
 
         Then then = method.getAnnotation(Then.class);
 
-        if (then != null)
-        {
+        if (then != null) {
             checkInvalidStepDefinition(result, method);
             result = then.value();
         }
 
         And and = method.getAnnotation(And.class);
 
-        if (and != null)
-        {
+        if (and != null) {
             checkInvalidStepDefinition(result, method);
             result = and.value();
         }
 
         But but = method.getAnnotation(But.class);
 
-        if (but != null)
-        {
+        if (but != null) {
             checkInvalidStepDefinition(result, method);
             result = but.value();
         }
@@ -105,108 +95,86 @@ public class GreenCoffeeSteps
         return result;
     }
 
-    private void checkInvalidStepDefinition(String pattern, Method method)
-    {
-        if (pattern != null)
-        {
+    private void checkInvalidStepDefinition(String pattern, Method method) {
+        if (pattern != null) {
             throw new InvalidStepDefinitionException(method);
         }
     }
 
-    protected ActionableObject onViewWithId(@IdRes int resourceId)
-    {
+    protected ActionableObject onViewWithId(@IdRes int resourceId) {
         return new ActionableView(onView(withId(resourceId)));
     }
 
-    protected ActionableObject onViewWithId(@IdRes int resourceId, int index)
-    {
+    protected ActionableObject onViewWithId(@IdRes int resourceId, int index) {
         return new ActionableView(onView(withIndex(withId(resourceId), index)));
     }
 
-    protected ActionableObject onViewWithText(@StringRes int resourceId)
-    {
+    protected ActionableObject onViewWithText(@StringRes int resourceId) {
         return new ActionableView(onView(ViewMatchers.withText(resourceId)));
     }
 
-    protected ActionableObject onViewWithText(@StringRes int resourceId, int index)
-    {
+    protected ActionableObject onViewWithText(@StringRes int resourceId, int index) {
         return new ActionableView(onView(withIndex(ViewMatchers.withText(resourceId), index)));
     }
 
-    protected ActionableObject onViewWithText(Object text)
-    {
+    protected ActionableObject onViewWithText(Object text) {
         return new ActionableView(onView(ViewMatchers.withText(text.toString())));
     }
 
-    protected ActionableObject onViewWithText(Object text, int index)
-    {
+    protected ActionableObject onViewWithText(Object text, int index) {
         return new ActionableView(onView(withIndex(ViewMatchers.withText(text.toString()), index)));
     }
 
-    protected ActionableObject onViewWithAll(Matcher<? super View>... matchers)
-    {
+    protected ActionableObject onViewWithAll(Matcher<? super View>... matchers) {
         return new ActionableView(onView(allOf(matchers)));
     }
 
-    protected <T> ActionableObject onViewWithObject(T object)
-    {
+    protected <T> ActionableObject onViewWithObject(T object) {
         return new ActionableData(onData(new ObjectMatcher<>(object)));
     }
 
-    protected <T> ActionableObject onViewWithObject(@IdRes int resourceId, Class<T> clazz, T object)
-    {
+    protected <T> ActionableObject onViewWithObject(@IdRes int resourceId, Class<T> clazz, T object) {
         return new DataMatcher<>(resourceId, clazz).with(object);
     }
 
-    protected ActionableObject onViewChildOf(@IdRes int parentViewId, int index)
-    {
+    protected ActionableObject onViewChildOf(@IdRes int parentViewId, int index) {
         return new ActionableView(onView(nthChildOf(withId(parentViewId), index)));
     }
 
-    protected void pressBack()
-    {
+    protected void pressBack() {
         Espresso.pressBack();
     }
 
-    protected void closeKeyboard()
-    {
+    protected void closeKeyboard() {
         Espresso.closeSoftKeyboard();
     }
 
-    protected String string(@StringRes int stringId)
-    {
+    protected String string(@StringRes int stringId) {
         return InstrumentationRegistry.getTargetContext().getString(stringId);
     }
 
-    protected Locale locale()
-    {
+    protected Locale locale() {
         return new Localization(InstrumentationRegistry.getTargetContext()).locale();
     }
 
-    protected void takeScreenshot(File file)
-    {
+    protected void takeScreenshot(File file) {
         ScreenCapture screenCapture = new ScreenCapture();
         screenCapture.takeScreenshot(file);
     }
 
-    protected Matcher<View> withIndex(Matcher<View> matcher, int index)
-    {
-        return new TypeSafeMatcher<View>()
-        {
+    protected Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
+        return new TypeSafeMatcher<View>() {
             private int currentIndex;
             private int viewObjHash;
 
             @Override
-            public void describeTo(Description description)
-            {
+            public void describeTo(Description description) {
                 description.appendText(String.format("with index: %d", index));
             }
 
             @Override
-            public boolean matchesSafely(View view)
-            {
-                if (matcher.matches(view) && (currentIndex++ == index))
-                {
+            public boolean matchesSafely(View view) {
+                if (matcher.matches(view) && (currentIndex++ == index)) {
                     viewObjHash = view.hashCode();
                 }
 
@@ -215,21 +183,16 @@ public class GreenCoffeeSteps
         };
     }
 
-    protected Matcher<View> nthChildOf(Matcher<View> parentMatcher, int childPosition)
-    {
-        return new TypeSafeMatcher<View>()
-        {
+    protected Matcher<View> nthChildOf(final Matcher<View> parentMatcher, final int childPosition) {
+        return new TypeSafeMatcher<View>() {
             @Override
-            public void describeTo(Description description)
-            {
+            public void describeTo(Description description) {
                 description.appendText(String.format("with %d child view of type parentMatcher", childPosition));
             }
 
             @Override
-            public boolean matchesSafely(View view)
-            {
-                if (!(view.getParent() instanceof ViewGroup))
-                {
+            public boolean matchesSafely(View view) {
+                if (!(view.getParent() instanceof ViewGroup)) {
                     return parentMatcher.matches(view.getParent());
                 }
 
@@ -240,37 +203,30 @@ public class GreenCoffeeSteps
         };
     }
 
-    protected void waitFor(long value, TimeUnit timeUnit)
-    {
+    protected void waitFor(long value, TimeUnit timeUnit) {
         onView(isRoot()).perform(actionWaitFor(value, timeUnit));
     }
 
-    protected void waitFor(long millis)
-    {
+    protected void waitFor(long millis) {
         waitFor(millis, TimeUnit.MILLISECONDS);
     }
 
-    private ViewAction actionWaitFor(long value, TimeUnit timeUnit)
-    {
-        long millis = timeUnit.toMillis(value);
+    private ViewAction actionWaitFor(long value, TimeUnit timeUnit) {
+        final long millis = timeUnit.toMillis(value);
 
-        return new ViewAction()
-        {
+        return new ViewAction() {
             @Override
-            public Matcher<View> getConstraints()
-            {
+            public Matcher<View> getConstraints() {
                 return isRoot();
             }
 
             @Override
-            public String getDescription()
-            {
+            public String getDescription() {
                 return "Wait for " + millis + " milliseconds.";
             }
 
             @Override
-            public void perform(UiController uiController, View view)
-            {
+            public void perform(UiController uiController, View view) {
                 uiController.loopMainThreadForAtLeast(millis);
             }
         };
